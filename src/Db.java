@@ -213,9 +213,16 @@ properties.put("password", password);
 properties.put("oracle.jdbc.RetainV9LongBindBehavior", "true");        
 Connection con = DriverManager.getConnection(url, properties);
 */
-public static void dbConnect ( String url, String username, String password, boolean read_only ) throws SQLException, VTLError
+public static void dbConnect ( String url, String username, String password, String dataBaseType, boolean read_only ) throws SQLException, VTLError
 {
-	Connection 	newConnection ;
+	if(dataBaseType.equalsIgnoreCase("POSTGRESQL"))
+	{
+		PostgresDB.dbConnect(url, username, password, dataBaseType, read_only);
+	}
+	else
+	{
+		Connection 	newConnection ;
+	
 	
 	try {	
 		if ( DbConnection == null )
@@ -253,6 +260,7 @@ public static void dbConnect ( String url, String username, String password, boo
   
 	if ( read_only )
 		DbConnection.setReadOnly ( true ) ;
+	}
 }
 
 public static void readVTLMetabase ( ) throws VTLError
