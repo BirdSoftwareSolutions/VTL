@@ -26,27 +26,29 @@ public static void main ( String [] args )
 	StringBuffer	cmd = new StringBuffer ( 1000 ) ;
 	boolean 		read_only = false, create_metabase = false ;
 	String			command_file_name = null, url,username, password ;
+	String databaseType;
   	
-	if ( args.length < 3 || args.length > 5 ) {
+	if ( args.length < 4 || args.length > 6 ) {
 		Sys.printStdOut ( "\nUsage: " ) ;
-		Sys.printStdOut ( "vtl.jar databaseUrl username password { -createmetabase | -readonly | -vtl2.0 | -x commandFile }" ) ; 
+		Sys.printStdOut ( "vtl.jar databaseUrl username password databaseType { -createmetabase | -readonly | -vtl2.0 | -x commandFile }" ) ; 
 		return ;
 	}
 	
 	url = args[0] ;
 	username = args[1] ;
 	password = args[2] ;
+	databaseType = args[3] ;
 	
 	switch ( args.length ) {
-		case 4 :
-			switch ( args[3] ) {
+		case 5 :
+			switch ( args[4] ) {
 				case "-readonly" : read_only = true ; break ;
 				case "-createmetabase" : create_metabase = true ; break ;
 				case "-vtl2.0" : vtl20only = true ; break ;
 			}
 			break ;
-		case 5 : 
-	  		if ( args [3].equals ( "-x" ) )
+		case 6 : 
+	  		if ( args [4].equals ( "-x" ) )
 	  			command_file_name = args [ 4 ] ;
 	  		else {	
 	  			Sys.printStdOut( "bad option" ) ;
@@ -55,7 +57,7 @@ public static void main ( String [] args )
 	}
 	
 	try {
-		Db.dbConnect ( url, username, password, read_only ) ;		  
+		Db.dbConnect ( url, username,password ,databaseType , read_only ) ;		  
 	}
 	catch ( Exception e ) {
 	    Sys.printErrorMessage ( e.getMessage () ) ;
@@ -64,7 +66,10 @@ public static void main ( String [] args )
 	
 	if ( create_metabase ) {
 		try {
-			Metabase.createMetabase( );
+			if(databaseType.equalsIgnoreCase("POSTGRESQL"))
+				PostgresMetabase.createMetabase( );
+			else
+				Metabase.createMetabase( );
 		}
 		catch ( VTLError e ) {
 		    Sys.printErrorMessage ( e.getErrorType(), e.getErrorMessage (), "", 0 ) ;
